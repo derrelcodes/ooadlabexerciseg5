@@ -25,9 +25,12 @@ class MainFrame extends JFrame {
 
         // Right side with top and bottom toolbar
         JPanel rightPanel = new JPanel(new BorderLayout());
-        rightPanel.add(RightCanvasControls.createTopPanel(), BorderLayout.NORTH);
-        rightPanel.add(new RightCanvas(), BorderLayout.CENTER);
-        rightPanel.add(RightCanvasControls.createBottomPanel(), BorderLayout.SOUTH);
+RightCanvas rightCanvas = new RightCanvas(); // Create canvas instance first
+
+// Pass the canvas to the controls
+rightPanel.add(RightCanvasControls.createTopPanel(rightCanvas), BorderLayout.NORTH);
+rightPanel.add(rightCanvas, BorderLayout.CENTER);
+rightPanel.add(RightCanvasControls.createBottomPanel(), BorderLayout.SOUTH);
 
         // Add all to the center
         centerPanel.add(leftPanel);
