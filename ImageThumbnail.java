@@ -13,11 +13,12 @@ public class ImageThumbnail extends JButton {
         Image scaled = icon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
         setIcon(new ImageIcon(scaled));
         setPreferredSize(new Dimension(100, 100));
+        setMaximumSize(new Dimension(100, 100));
+        setMinimumSize(new Dimension(100, 100));
         setContentAreaFilled(false);
         setBorderPainted(false);
         setFocusPainted(false);
 
-        // Set custom TransferHandler
         setTransferHandler(new TransferHandler() {
             @Override
             protected Transferable createTransferable(JComponent c) {
@@ -30,7 +31,6 @@ public class ImageThumbnail extends JButton {
             }
         });
 
-        // Trigger drag on mouse press
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 JComponent comp = (JComponent) e.getSource();

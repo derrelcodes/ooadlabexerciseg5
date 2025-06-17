@@ -1,5 +1,7 @@
+// DrawingStudioPro.java (Main class and main frame layout)
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class DrawingStudioPro {
     public static void main(String[] args) {
@@ -9,35 +11,56 @@ public class DrawingStudioPro {
 
 // Bundled MainFrame class
 class MainFrame extends JFrame {
+    private JPanel collectionWrapper;
+    private boolean collectionVisible = true;
+
     public MainFrame() {
         setTitle("Drawing Studio Pro");
         setSize(1200, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Split into 3 sections: Left Canvas | Right Canvas | Collection Panel
-        JPanel centerPanel = new JPanel(new GridLayout(1, 3));
+        // Wrapper panel for left side controls and toggle
+        JPanel leftSidebar = new JPanel();
+        leftSidebar.setLayout(new BorderLayout());
 
-        // Left side with canvas and bottom controls
+        // Toggle button to show/hide collection panel
+        JButton toggleCollectionBtn = new JButton("☰ Media");
+        toggleCollectionBtn.addActionListener(e -> {
+            collectionVisible = !collectionVisible;
+            collectionWrapper.setVisible(collectionVisible);
+            revalidate();
+        });
+        leftSidebar.add(toggleCollectionBtn, BorderLayout.NORTH);
+
+        // Wrapped collection panel with half-height
+        collectionWrapper = new JPanel(new BorderLayout());
+        CollectionPanel collectionPanel = new CollectionPanel();
+        collectionWrapper.add(collectionPanel, BorderLayout.NORTH);
+        collectionWrapper.setPreferredSize(new Dimension(250, 300)); // half height-ish
+        leftSidebar.add(collectionWrapper, BorderLayout.CENTER);
+
+        // Central canvas area (Left + Right)
+        JPanel canvasPanel = new JPanel(new GridLayout(1, 2));
+
         JPanel leftPanel = new JPanel(new BorderLayout());
         leftPanel.add(new LeftCanvas(), BorderLayout.CENTER);
         leftPanel.add(new LeftCanvasControls(), BorderLayout.SOUTH);
 
-        // Right side with top and bottom toolbar
         JPanel rightPanel = new JPanel(new BorderLayout());
-RightCanvas rightCanvas = new RightCanvas(); // Create canvas instance first
+        RightCanvas rightCanvas = new RightCanvas(); // create it once and reuse
+        rightPanel.add(RightCanvasControls.createTopPanel(rightCanvas), BorderLayout.NORTH);
+        rightPanel.add(rightCanvas, BorderLayout.CENTER);
+        rightPanel.add(RightCanvasControls.createBottomPanel(), BorderLayout.SOUTH);
 
-// Pass the canvas to the controls
-rightPanel.add(RightCanvasControls.createTopPanel(rightCanvas), BorderLayout.NORTH);
-rightPanel.add(rightCanvas, BorderLayout.CENTER);
-rightPanel.add(RightCanvasControls.createBottomPanel(), BorderLayout.SOUTH);
 
-        // Add all to the center
-        centerPanel.add(leftPanel);
-        centerPanel.add(rightPanel);
-        centerPanel.add(new CollectionPanel());
+        canvasPanel.add(leftPanel);
+        canvasPanel.add(rightPanel);
 
-        add(centerPanel, BorderLayout.CENTER);
+        // Add panels to frame
+        add(leftSidebar, BorderLayout.WEST);
+        add(canvasPanel, BorderLayout.CENTER);
+
         setVisible(true);
     }
 }
