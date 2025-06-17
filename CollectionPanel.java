@@ -17,20 +17,31 @@ public class CollectionPanel extends JPanel {
     }
 
     private JScrollPane createImageGrid(String type) {
-        JPanel gridPanel = new JPanel(new GridLayout(0, 3, 5, 5));
+        // Custom panel to force preferred height for scrolling
+        JPanel gridPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 10, 10)) {
+            @Override
+            public Dimension getPreferredSize() {
+                int count = getComponentCount();
+                int rows = (int) Math.ceil(count / 3.0);
+                int height = rows * 120; // 100px + padding
+                return new Dimension(350, height);
+            }
+        };
+
+        gridPanel.setBackground(Color.WHITE);
+        gridPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         if (type.equals("Image")) {
-            // Upload button at index 0
+            // Upload Button
             JButton uploadBtn = new JButton("Upload");
+            uploadBtn.setPreferredSize(new Dimension(100, 100));
             uploadBtn.addActionListener(e -> {
                 File newImage = ImageUploader.uploadImage(this);
-                if (newImage != null) {
-                    refreshImagesTab(); // Refresh if upload successful
-                }
+                if (newImage != null) refreshImagesTab();
             });
             gridPanel.add(uploadBtn);
 
-            // Load all images from assets/images/
+            // Load images from assets/images/
             File[] files = new File("assets/images/").listFiles((dir, name) -> {
                 String lower = name.toLowerCase();
                 return lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg");
@@ -41,16 +52,19 @@ public class CollectionPanel extends JPanel {
                     gridPanel.add(new ImageThumbnail(imgFile.getPath()));
                 }
             }
-
         } else {
-            // Your original 9-button logic
+            // Static placeholders (replace with real animal/flower image paths)
             for (int i = 0; i < 9; i++) {
-                JButton button = new ImageThumbnail(type + " " + (i + 1));
-                gridPanel.add(button);
+                gridPanel.add(new ImageThumbnail("assets/placeholder.png"));
             }
         }
 
-        return new JScrollPane(gridPanel);
+        JScrollPane scrollPane = new JScrollPane(gridPanel,
+                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+
+        return scrollPane;
     }
 
     private void refreshImagesTab() {
