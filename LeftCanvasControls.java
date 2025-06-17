@@ -1,18 +1,35 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class LeftCanvasControls extends JPanel {
-    public LeftCanvasControls() {
-        setLayout(new GridLayout(1, 3));
+public class LeftCanvasControls {
 
-        add(createIconButton("rotate.png"));
-        add(createIconButton("refresh.png"));
-        add(createIconButton("save.png"));
-    }
+    public static JPanel createButtonPanel(LeftCanvas canvas) {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
-    private JButton createIconButton(String filename) {
-        ImageIcon icon = new ImageIcon("assets/icons/" + filename);
-        Image scaled = icon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
-        return new JButton(new ImageIcon(scaled));
+        JButton rotateBtn = new JButton("Rotate");
+        JButton refreshBtn = new JButton("Refresh");
+        JButton saveBtn = new JButton("Save");
+
+        // Dummy actions — replace with actual canvas logic if needed
+        rotateBtn.addActionListener(e -> {
+            System.out.println("Rotate button clicked");
+            // canvas.rotateSelectedItem(); // if implemented
+        });
+
+        refreshBtn.addActionListener(e -> {
+            System.out.println("Refresh button clicked");
+            canvas.repaint();
+        });
+
+        saveBtn.addActionListener(e -> {
+            System.out.println("Save button clicked");
+            // canvas.saveCanvasAsImage(); // if implemented
+        });
+
+        panel.add(rotateBtn);
+        panel.add(refreshBtn);
+        panel.add(saveBtn);
+
+        return panel;
     }
 }
