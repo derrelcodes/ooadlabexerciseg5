@@ -69,7 +69,7 @@ public class RightCanvasControls {
 
         // The statusLabel and its usage were removed as per your request.
 
-        JButton clearButton = new JButton("Clear Canvas");
+        JButton clearButton = new JButton("Clear Drawing");
         clearButton.setBackground(new Color(220, 53, 69));
         clearButton.setForeground(Color.WHITE);
         clearButton.setFocusPainted(false);
@@ -315,8 +315,8 @@ public class RightCanvasControls {
         if (canvas != null) {
             int result = JOptionPane.showConfirmDialog(
                 null,
-                "Are you sure you want to clear the canvas? This action cannot be undone.",
-                "Clear Canvas",
+                "Are you sure you want to clear the drawing? This action cannot be undone.",
+                "Clear Drawing",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE
             );
