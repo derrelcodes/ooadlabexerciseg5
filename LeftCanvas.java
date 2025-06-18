@@ -6,41 +6,70 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class LeftCanvas extends JPanel {
     private java.util.List<CanvasItem> items = new ArrayList<>();
     private CanvasItem selectedItem = null;
     private Point lastMousePoint = null;
-    private String mode = "";
+    private String mode = ""; // Stores "move", "rotate", or "resize-TL", "resize-BR" etc.
 
     public LeftCanvas() {
-        setBackground(Color.white);
+        setBackground(Color.LIGHT_GRAY);
         setTransferHandler(new ImageDropHandler());
 
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 lastMousePoint = e.getPoint();
-                for (CanvasItem item : items) {
+
+                CanvasItem clickedItem = null;
+                String newMode = "";
+
+                // Iterate through items in reverse to find the topmost item clicked
+                for (int i = items.size() - 1; i >= 0; i--) {
+                    CanvasItem item = items.get(i);
                     if (item.onRotateHandle(e.getX(), e.getY())) {
-                        selectedItem = item;
-                        mode = "rotate";
-                        return;
-                    } else if (item.onResizeHandle(e.getX(), e.getY())) {
-                        selectedItem = item;
-                        mode = "resize";
-                        return;
-                    } else if (item.contains(e.getX(), e.getY())) {
-                        selectedItem = item;
-                        mode = "move";
-                        return;
+                        clickedItem = item;
+                        newMode = "rotate";
+                        break;
+                    } else {
+                        String handleType = item.getResizeHandle(e.getX(), e.getY()); // Get specific handle type
+                        if (handleType != null) {
+                            clickedItem = item;
+                            newMode = "resize-" + handleType; // e.g., "resize-TL", "resize-BR"
+                            break;
+                        }
+                    }
+                    if (item.contains(e.getX(), e.getY())) {
+                        clickedItem = item;
+                        newMode = "move";
+                        break;
                     }
                 }
-                selectedItem = null;
-                mode = "";
+
+                // Handle selection state and layering
+                if (selectedItem != null && selectedItem != clickedItem) {
+                    selectedItem.setSelected(false); // Deselect the old item if a new one is clicked
+                }
+
+                selectedItem = clickedItem; // Set the new selected item
+                mode = newMode; // Set the interaction mode
+
+                if (selectedItem != null) {
+                    selectedItem.setSelected(true); // Mark the new item as selected
+                    // Bring the selected item to the top of the drawing order (Z-order)
+                    if (items.indexOf(selectedItem) < items.size() - 1) {
+                        items.remove(selectedItem);
+                        items.add(selectedItem); // Add to end of list
+                    }
+                }
+
+                repaint(); // Repaint to show/hide handles and update layering
             }
 
             public void mouseReleased(MouseEvent e) {
-                selectedItem = null;
+                // Keep selectedItem as is; handles should remain visible after dragging.
+                // Only reset the drag mode.
                 mode = "";
             }
         });
@@ -51,16 +80,18 @@ public class LeftCanvas extends JPanel {
                     int dx = e.getX() - lastMousePoint.x;
                     int dy = e.getY() - lastMousePoint.y;
 
-                    switch (mode) {
-                        case "move":
-                            selectedItem.move(dx, dy);
-                            break;
-                        case "resize":
-                            selectedItem.resize(dx, dy);
-                            break;
-                        case "rotate":
-                            selectedItem.rotate(dx);
-                            break;
+                    if (mode.startsWith("resize-")) { // Check if mode starts with "resize-"
+                        String handleType = mode.substring(mode.indexOf('-') + 1); // Extract handle type (e.g., "TL")
+                        selectedItem.resize(handleType, dx, dy); // Call new resize method
+                    } else {
+                        switch (mode) {
+                            case "move":
+                                selectedItem.move(dx, dy);
+                                break;
+                            case "rotate":
+                                selectedItem.rotate(dx);
+                                break;
+                        }
                     }
 
                     lastMousePoint = e.getPoint();
@@ -91,7 +122,17 @@ public class LeftCanvas extends JPanel {
             try {
                 String imagePath = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
                 Point dropPoint = support.getDropLocation().getDropPoint();
-                items.add(new CanvasItem(imagePath, dropPoint.x, dropPoint.y));
+
+                // Deselect any previously selected item
+                if (selectedItem != null) {
+                    selectedItem.setSelected(false);
+                }
+
+                CanvasItem newItem = new CanvasItem(imagePath, dropPoint.x, dropPoint.y);
+                items.add(newItem); // Add to end for layering
+                selectedItem = newItem; // Select the newly dropped item
+                selectedItem.setSelected(true); // Set its selected state to true
+
                 repaint();
                 return true;
             } catch (Exception ex) {
@@ -106,6 +147,7 @@ public class LeftCanvas extends JPanel {
     // Clears all items
     public void clearCanvas() {
         items.clear();
+        selectedItem = null; // Also clear selection
         repaint();
     }
 
