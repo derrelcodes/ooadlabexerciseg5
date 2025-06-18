@@ -1,35 +1,35 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class LeftCanvasControls {
-
     public static JPanel createButtonPanel(LeftCanvas canvas) {
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        buttonPanel.setBackground(new Color(245, 245, 245));
 
         JButton rotateBtn = new JButton("Rotate");
+        rotateBtn.setPreferredSize(new Dimension(90, 30));
+        rotateBtn.addActionListener((ActionEvent e) -> canvas.rotateCanvas());
+
         JButton refreshBtn = new JButton("Refresh");
+        refreshBtn.setPreferredSize(new Dimension(90, 30));
+        refreshBtn.addActionListener((ActionEvent e) -> {
+            int confirm = JOptionPane.showConfirmDialog(null,
+                    "Clear the entire canvas?", "Confirm",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (confirm == JOptionPane.YES_OPTION) {
+                canvas.clearCanvas();
+            }
+        });
+
         JButton saveBtn = new JButton("Save");
+        saveBtn.setPreferredSize(new Dimension(90, 30));
+        saveBtn.addActionListener((ActionEvent e) -> canvas.saveCanvasAsImage());
 
-        // Dummy actions — replace with actual canvas logic if needed
-        rotateBtn.addActionListener(e -> {
-            System.out.println("Rotate button clicked");
-            // canvas.rotateSelectedItem(); // if implemented
-        });
+        buttonPanel.add(rotateBtn);
+        buttonPanel.add(refreshBtn);
+        buttonPanel.add(saveBtn);
 
-        refreshBtn.addActionListener(e -> {
-            System.out.println("Refresh button clicked");
-            canvas.repaint();
-        });
-
-        saveBtn.addActionListener(e -> {
-            System.out.println("Save button clicked");
-            // canvas.saveCanvasAsImage(); // if implemented
-        });
-
-        panel.add(rotateBtn);
-        panel.add(refreshBtn);
-        panel.add(saveBtn);
-
-        return panel;
+        return buttonPanel;
     }
 }
