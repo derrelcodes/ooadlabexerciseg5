@@ -17,33 +17,49 @@ public class DrawingStudioPro {
             mediaPanel.setPreferredSize(new Dimension(300, 0));
             mediaPanel.add(new CollectionPanel(), BorderLayout.CENTER);
 
-            // ===== CENTER: Canvas Panel (Left + Right Canvas)
-            JPanel canvasPanel = new JPanel(new GridLayout(1, 2));
+            // ===== Canvas Panels (Left + Right Canvas)
+            // Use JSplitPane for draggable and distinct differentiation
+            JSplitPane canvasSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+            canvasSplitPane.setDividerSize(8); // Thicker divider for distinct differentiation
+            canvasSplitPane.setContinuousLayout(true); // Smooth dragging
+            canvasSplitPane.setResizeWeight(0.5); // Start with equal distribution, will adjust based on user dragging
 
             // LEFT PANEL: "Composition"
             LeftCanvas leftCanvas = new LeftCanvas();
+            // Add a border to the canvas itself for distinct differentiation
+            // Using a 5-pixel dark gray border to make it stand out.
+            leftCanvas.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
+
             JPanel leftPanel = new JPanel(new BorderLayout());
 
-            JLabel leftLabel = new JLabel("Composition Canvas", SwingConstants.CENTER);
+            JLabel leftLabel = new JLabel("Composition", SwingConstants.CENTER);
             leftLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-            leftPanel.add(LeftCanvasControls.createTopPanel(leftCanvas), BorderLayout.NORTH);
+            leftLabel.setForeground(Color.WHITE);
+            leftLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+            JPanel topLeftPanel = new JPanel(new BorderLayout());
+            topLeftPanel.setBackground(new Color(45, 45, 45));
+            topLeftPanel.add(leftLabel, BorderLayout.NORTH);
+            topLeftPanel.add(LeftCanvasControls.createButtonPanel(leftCanvas), BorderLayout.CENTER);
+
+            leftPanel.add(topLeftPanel, BorderLayout.NORTH);
             leftPanel.add(leftCanvas, BorderLayout.CENTER);
-            leftCanvas.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
-            leftPanel.add(LeftCanvasControls.createBottomPanel(leftCanvas), BorderLayout.SOUTH);
 
             // RIGHT PANEL: "Drawing Pad"
             RightCanvas rightCanvas = new RightCanvas();
+            // Add a border to the canvas itself for distinct differentiation
+            // Using a 5-pixel dark gray border to make it stand out.
+            rightCanvas.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
+
             JPanel rightPanel = new JPanel(new BorderLayout());
 
-            // Drawing Pad Title Label
             JLabel rightLabel = new JLabel("Drawing Pad", SwingConstants.CENTER);
             rightLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
             rightLabel.setForeground(Color.WHITE);
             rightLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-            // Wrap title + toolbar in one top panel
             JPanel topRightPanel = new JPanel(new BorderLayout());
-            topRightPanel.setBackground(Color.DARK_GRAY);
+            topRightPanel.setBackground(new Color(45, 45, 45));
             topRightPanel.add(rightLabel, BorderLayout.NORTH);
             topRightPanel.add(RightCanvasControls.createTopPanel(rightCanvas), BorderLayout.CENTER);
 
@@ -51,13 +67,13 @@ public class DrawingStudioPro {
             rightPanel.add(rightCanvas, BorderLayout.CENTER);
             rightPanel.add(RightCanvasControls.createBottomPanel(), BorderLayout.SOUTH);
 
-            // Combine both panels
-            canvasPanel.add(leftPanel);
-            canvasPanel.add(rightPanel);
+            // Add the left and right panels to the JSplitPane
+            canvasSplitPane.setLeftComponent(leftPanel);
+            canvasSplitPane.setRightComponent(rightPanel);
 
             // ===== Assemble Main Layout
             add(mediaPanel, BorderLayout.WEST);
-            add(canvasPanel, BorderLayout.CENTER);
+            add(canvasSplitPane, BorderLayout.CENTER); // Add the split pane to the frame's center
 
             setSize(1200, 700);
             setLocationRelativeTo(null);
