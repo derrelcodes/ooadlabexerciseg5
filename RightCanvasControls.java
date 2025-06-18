@@ -10,61 +10,35 @@ public class RightCanvasControls {
     private static RightCanvas canvas;
     private static JButton penButton, eraserButton, colorButton, sizeButton, saveButton;
     private static JLabel statusLabel;
-    
+
     public static JPanel createTopPanel(RightCanvas canvasRef) {
-        canvas = canvasRef; // Set the canvas reference immediately
+        canvas = canvasRef;
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         topPanel.setBackground(new Color(45, 45, 45));
         topPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        
-        // Pen tool button
-        penButton = createToolButton("Pen", "Pen.png", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (canvas != null) {
-                    canvas.setEraser(false);
-                    updateButtonStates();
-                    updateStatus("Pen tool selected");
-                }
+
+        penButton = createToolButton("Pen", "Pen.png", e -> {
+            if (canvas != null) {
+                canvas.setEraser(false);
+                updateButtonStates();
+                updateStatus("Pen tool selected");
             }
         });
-        
-        // Eraser button
-        eraserButton = createToolButton("Eraser", "Eraser.png", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (canvas != null) {
-                    canvas.setEraser(true);
-                    updateButtonStates();
-                    updateStatus("Eraser tool selected");
-                }
+
+        eraserButton = createToolButton("Eraser", "Eraser.png", e -> {
+            if (canvas != null) {
+                canvas.setEraser(true);
+                updateButtonStates();
+                updateStatus("Eraser tool selected");
             }
         });
-        
-        // Color picker button
-        colorButton = createToolButton("Color", "Pen Colour.png", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSimpleColorPicker();
-            }
-        });
-        
-        // Stroke size button
-        sizeButton = createToolButton("Size", "Pen Size.png", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                showSizePicker();
-            }
-        });
-        
-        // Save button
-        saveButton = createToolButton("Save", "Save.png", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveDrawing();
-            }
-        });
-        
+
+        colorButton = createToolButton("Color", "Pen Colour.png", e -> showSimpleColorPicker());
+
+        sizeButton = createToolButton("Size", "Pen Size.png", e -> showSizePicker());
+
+        saveButton = createToolButton("Save", "Save.png", e -> saveDrawing());
+
         topPanel.add(penButton);
         topPanel.add(eraserButton);
         topPanel.add(Box.createHorizontalStrut(10));
@@ -72,99 +46,90 @@ public class RightCanvasControls {
         topPanel.add(sizeButton);
         topPanel.add(Box.createHorizontalStrut(10));
         topPanel.add(saveButton);
-        
+
         return topPanel;
     }
-    
+
     public static JPanel createBottomPanel() {
         JPanel bottomPanel = new JPanel(new BorderLayout());
         bottomPanel.setBackground(new Color(45, 45, 45));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        
-        // Status label
+
         statusLabel = new JLabel("Ready - Select a tool to start drawing");
         statusLabel.setForeground(Color.WHITE);
         statusLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        
-        // Clear button
+
         JButton clearButton = new JButton("Clear Canvas");
         clearButton.setBackground(new Color(220, 53, 69));
         clearButton.setForeground(Color.WHITE);
         clearButton.setFocusPainted(false);
         clearButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        clearButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearCanvas();
-            }
-        });
-        
+        clearButton.addActionListener(e -> clearCanvas());
+
         bottomPanel.add(statusLabel, BorderLayout.WEST);
         bottomPanel.add(clearButton, BorderLayout.EAST);
-        
+
         return bottomPanel;
     }
-    
+
     private static JButton createToolButton(String tooltip, String iconPath, ActionListener listener) {
         JButton button = new JButton();
         button.setToolTipText(tooltip);
-        button.setPreferredSize(new Dimension(50, 50)); // Bigger button size
+        button.setPreferredSize(new Dimension(56, 56));
         button.setBackground(new Color(70, 70, 70));
         button.setBorder(BorderFactory.createRaisedBevelBorder());
         button.setFocusPainted(false);
-        
-        // Try to load icon from different possible locations
+        button.setMargin(new Insets(4, 4, 4, 4)); // Internal padding
+
         boolean iconLoaded = false;
         String[] possiblePaths = {
-            iconPath,                           // Original path
-            "icons/" + iconPath,               // icons folder
-            "src/icons/" + iconPath,           // src/icons folder
-            "resources/" + iconPath,           // resources folder
-            System.getProperty("user.dir") + "/" + iconPath  // absolute path
+            iconPath,
+            "icons/" + iconPath,
+            "src/icons/" + iconPath,
+            "resources/" + iconPath,
+            System.getProperty("user.dir") + "/" + iconPath
         };
-        
+
         for (String path : possiblePaths) {
             try {
                 File iconFile = new File(path);
                 if (iconFile.exists()) {
                     ImageIcon icon = new ImageIcon(path);
                     if (icon.getIconWidth() > 0) {
-                        // Bigger icon size to fill the button
-                        Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                        Image img = icon.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH);
                         button.setIcon(new ImageIcon(img));
                         iconLoaded = true;
                         break;
                     }
                 }
-            } catch (Exception e) {
-                // Continue to next path
-            }
+            } catch (Exception ignored) {}
         }
-        
+
         if (!iconLoaded) {
-            // Fallback to text if icon not found
             button.setText(tooltip.substring(0, 1));
             button.setForeground(Color.WHITE);
-            button.setFont(new Font("Arial", Font.BOLD, 16)); // Bigger font
+            button.setFont(new Font("Arial", Font.BOLD, 16));
             System.out.println("Icon not found for " + tooltip + ", using text fallback");
         }
-        
+
         button.addActionListener(listener);
-        
-        // Hover effects
+
+        // Hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(90, 90, 90));
             }
+
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                if (!button.equals(penButton) || canvas == null || canvas.isEraser()) {
-                    if (!button.equals(eraserButton) || canvas == null || !canvas.isEraser()) {
-                        button.setBackground(new Color(70, 70, 70));
-                    }
+                if ((button == penButton && !canvas.isEraser()) ||
+                    (button == eraserButton && canvas.isEraser())) {
+                    button.setBackground(new Color(100, 150, 100)); // active
+                } else {
+                    button.setBackground(new Color(70, 70, 70)); // default
                 }
             }
         });
-        
+
         return button;
     }
     
