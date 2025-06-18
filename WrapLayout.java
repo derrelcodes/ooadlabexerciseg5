@@ -1,11 +1,12 @@
 import java.awt.*;
-import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 /**
- *  FlowLayout subclass that fully supports wrapping of components.
+ *  FlowLayout subclass that fully supports wrapping of components
+ *  and works properly inside JScrollPane.
  */
 public class WrapLayout extends FlowLayout {
+
     public WrapLayout() {
         super();
     }
@@ -33,12 +34,10 @@ public class WrapLayout extends FlowLayout {
     private Dimension layoutSize(Container target, boolean preferred) {
         synchronized (target.getTreeLock()) {
             int targetWidth = target.getWidth();
-            if (targetWidth == 0) {
-                Container container = target;
-                while (container.getParent() != null) {
-                    container = container.getParent();
-                }
-                targetWidth = container.getWidth();
+
+            // Support JScrollPane - fallback if width is 0
+            if (targetWidth == 0 && target.getParent() instanceof JViewport) {
+                targetWidth = ((JViewport) target.getParent()).getWidth();
             }
 
             Insets insets = target.getInsets();
@@ -54,7 +53,6 @@ public class WrapLayout extends FlowLayout {
 
             for (int i = 0; i < nmembers; i++) {
                 Component m = target.getComponent(i);
-
                 if (m.isVisible()) {
                     Dimension d = preferred ? m.getPreferredSize() : m.getMinimumSize();
 
