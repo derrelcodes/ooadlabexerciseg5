@@ -15,7 +15,7 @@ public class RightCanvas extends JPanel {
     // Drawing properties
     private Color currentColor = Color.BLACK;
     private int strokeSize = 3; // Pen size
-    private int eraserSize = 5; // NEW FIELD: Default eraser size
+    private static final int ERASER_SIZE = 20; // Constant eraser size
 
     private boolean isEraser = false;
 
@@ -118,7 +118,8 @@ public class RightCanvas extends JPanel {
         for (DrawingPath path : paths) {
             // Use path's color and stroke size when redrawing
             g2d.setColor(path.getColor());
-            g2d.setStroke(new BasicStroke(path.getStrokeSize(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            // Use constant ERASER_SIZE if path was drawn with eraser
+            g2d.setStroke(new BasicStroke(path.isEraser() ? ERASER_SIZE : path.getStrokeSize(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
             if (path.isEraser()) {
                 g2d.setComposite(AlphaComposite.Clear);
@@ -195,14 +196,14 @@ public class RightCanvas extends JPanel {
         prevY = y;
 
         // Pass the correct active stroke size to the DrawingPath
-        currentPath = new DrawingPath(currentColor, isEraser ? eraserSize : strokeSize, isEraser);
+        currentPath = new DrawingPath(currentColor, isEraser ? ERASER_SIZE : strokeSize, isEraser);
         currentPath.addPoint(x, y);
     }
 
     private void draw(int x, int y) {
         if (g2d != null) {
             // Use the correct stroke size based on the current tool
-            g2d.setStroke(new BasicStroke(isEraser ? eraserSize : strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g2d.setStroke(new BasicStroke(isEraser ? ERASER_SIZE : strokeSize, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
             if (isEraser) {
                 g2d.setComposite(AlphaComposite.Clear);
@@ -253,10 +254,7 @@ public class RightCanvas extends JPanel {
         this.strokeSize = size;
     }
 
-    // NEW METHOD: Sets eraser size
-    public void setEraserSize(int size) {
-        this.eraserSize = size;
-    }
+    // Removed: setEraserSize(int size) and getEraserSize()
 
     public void setEraser(boolean eraser) {
         this.isEraser = eraser;
@@ -275,14 +273,9 @@ public class RightCanvas extends JPanel {
         return strokeSize;
     }
 
-    // NEW METHOD: Returns eraser size
-    public int getEraserSize() {
-        return eraserSize;
-    }
-
-    // NEW METHOD: Returns the currently active stroke size (either pen or eraser)
+    // Returns the currently active stroke size (either pen or constant eraser size)
     public int getActiveStrokeSize() {
-        return isEraser ? eraserSize : strokeSize;
+        return isEraser ? ERASER_SIZE : strokeSize;
     }
 
     public BufferedImage getCanvasImage() {

@@ -1,3 +1,5 @@
+// In DrawingStudioPro.java
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -14,20 +16,17 @@ public class DrawingStudioPro {
 
             // ===== LEFT: Collection Panel (Media)
             JPanel mediaPanel = new JPanel(new BorderLayout());
-            mediaPanel.setPreferredSize(new Dimension(300, 0));
+            mediaPanel.setPreferredSize(new Dimension(270, 0));
             mediaPanel.add(new CollectionPanel(), BorderLayout.CENTER);
 
             // ===== Canvas Panels (Left + Right Canvas)
-            // Use JSplitPane for draggable and distinct differentiation
             JSplitPane canvasSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-            canvasSplitPane.setDividerSize(8); // Thicker divider for distinct differentiation
-            canvasSplitPane.setContinuousLayout(true); // Smooth dragging
-            canvasSplitPane.setResizeWeight(0.5); // Start with equal distribution, will adjust based on user dragging
+            canvasSplitPane.setDividerSize(8);
+            canvasSplitPane.setContinuousLayout(true);
+            canvasSplitPane.setResizeWeight(0.5);
 
             // LEFT PANEL: "Composition"
             LeftCanvas leftCanvas = new LeftCanvas();
-            // Add a border to the canvas itself for distinct differentiation
-            // Using a 5-pixel dark gray border to make it stand out.
             leftCanvas.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
 
             JPanel leftPanel = new JPanel(new BorderLayout());
@@ -44,11 +43,11 @@ public class DrawingStudioPro {
 
             leftPanel.add(topLeftPanel, BorderLayout.NORTH);
             leftPanel.add(leftCanvas, BorderLayout.CENTER);
+            // ADD THIS LINE: Add the new bottom panel to the SOUTH of the leftPanel
+            leftPanel.add(LeftCanvasControls.createBottomPanel(leftCanvas), BorderLayout.SOUTH); //
 
-            // RIGHT PANEL: "Drawing Pad"
+            // RIGHT PANEL: "Drawing Pad" (remains unchanged)
             RightCanvas rightCanvas = new RightCanvas();
-            // Add a border to the canvas itself for distinct differentiation
-            // Using a 5-pixel dark gray border to make it stand out.
             rightCanvas.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
 
             JPanel rightPanel = new JPanel(new BorderLayout());
@@ -73,7 +72,7 @@ public class DrawingStudioPro {
 
             // ===== Assemble Main Layout
             add(mediaPanel, BorderLayout.WEST);
-            add(canvasSplitPane, BorderLayout.CENTER); // Add the split pane to the frame's center
+            add(canvasSplitPane, BorderLayout.CENTER);
 
             setSize(1200, 700);
             setLocationRelativeTo(null);
