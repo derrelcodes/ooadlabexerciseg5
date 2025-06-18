@@ -14,36 +14,52 @@ public class DrawingStudioPro {
 
             // ===== LEFT: Collection Panel (Media)
             JPanel mediaPanel = new JPanel(new BorderLayout());
-            mediaPanel.setPreferredSize(new Dimension(300, 0)); // Full height, fixed width
+            mediaPanel.setPreferredSize(new Dimension(300, 0));
             mediaPanel.add(new CollectionPanel(), BorderLayout.CENTER);
 
             // ===== CENTER: Canvas Panel (Left + Right Canvas)
             JPanel canvasPanel = new JPanel(new GridLayout(1, 2));
 
-            // LEFT CANVAS with control buttons below
-            JPanel leftPanel = new JPanel(new BorderLayout());
+            // LEFT PANEL: "Composition"
             LeftCanvas leftCanvas = new LeftCanvas();
+            JPanel leftPanel = new JPanel(new BorderLayout());
+
+            JLabel leftLabel = new JLabel("Composition", SwingConstants.CENTER);
+            leftLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+            leftPanel.add(leftLabel, BorderLayout.NORTH);
             leftPanel.add(leftCanvas, BorderLayout.CENTER);
             leftPanel.add(LeftCanvasControls.createButtonPanel(leftCanvas), BorderLayout.SOUTH);
 
-            // RIGHT CANVAS with tools on top/bottom
-            JPanel rightPanel = new JPanel(new BorderLayout());
+            // RIGHT PANEL: "Drawing Pad"
             RightCanvas rightCanvas = new RightCanvas();
-            rightPanel.add(RightCanvasControls.createTopPanel(rightCanvas), BorderLayout.NORTH);
+            JPanel rightPanel = new JPanel(new BorderLayout());
+
+            // Drawing Pad Title Label
+            JLabel rightLabel = new JLabel("Drawing Pad", SwingConstants.CENTER);
+            rightLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
+            rightLabel.setForeground(Color.WHITE);
+            rightLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+            // Wrap title + toolbar in one top panel
+            JPanel topRightPanel = new JPanel(new BorderLayout());
+            topRightPanel.setBackground(Color.DARK_GRAY);
+            topRightPanel.add(rightLabel, BorderLayout.NORTH);
+            topRightPanel.add(RightCanvasControls.createTopPanel(rightCanvas), BorderLayout.CENTER);
+
+            rightPanel.add(topRightPanel, BorderLayout.NORTH);
             rightPanel.add(rightCanvas, BorderLayout.CENTER);
             rightPanel.add(RightCanvasControls.createBottomPanel(), BorderLayout.SOUTH);
 
-            // Add both canvases to the center panel
+            // Combine both panels
             canvasPanel.add(leftPanel);
             canvasPanel.add(rightPanel);
 
-            // ===== Assemble full UI
-            add(mediaPanel, BorderLayout.WEST);     // Media (Collection) panel on the left
-            add(canvasPanel, BorderLayout.CENTER);  // Canvases on the right
+            // ===== Assemble Main Layout
+            add(mediaPanel, BorderLayout.WEST);
+            add(canvasPanel, BorderLayout.CENTER);
 
-            // Final frame setup
             setSize(1200, 700);
-            setLocationRelativeTo(null); // Center the window
+            setLocationRelativeTo(null);
             setVisible(true);
         }
     }
