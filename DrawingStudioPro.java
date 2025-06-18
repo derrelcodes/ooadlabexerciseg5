@@ -24,11 +24,12 @@ public class DrawingStudioPro {
             LeftCanvas leftCanvas = new LeftCanvas();
             JPanel leftPanel = new JPanel(new BorderLayout());
 
-            JLabel leftLabel = new JLabel("Composition", SwingConstants.CENTER);
+            JLabel leftLabel = new JLabel("Composition Canvas", SwingConstants.CENTER);
             leftLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
-            leftPanel.add(leftLabel, BorderLayout.NORTH);
+            leftPanel.add(LeftCanvasControls.createTopPanel(leftCanvas), BorderLayout.NORTH);
             leftPanel.add(leftCanvas, BorderLayout.CENTER);
-            leftPanel.add(LeftCanvasControls.createButtonPanel(leftCanvas), BorderLayout.SOUTH);
+            leftCanvas.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 2));
+            leftPanel.add(LeftCanvasControls.createBottomPanel(leftCanvas), BorderLayout.SOUTH);
 
             // RIGHT PANEL: "Drawing Pad"
             RightCanvas rightCanvas = new RightCanvas();

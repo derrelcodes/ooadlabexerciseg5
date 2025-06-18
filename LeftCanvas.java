@@ -14,7 +14,7 @@ public class LeftCanvas extends JPanel {
     private String mode = "";
 
     public LeftCanvas() {
-        setBackground(Color.LIGHT_GRAY);
+        setBackground(Color.white);
         setTransferHandler(new ImageDropHandler());
 
         addMouseListener(new MouseAdapter() {
