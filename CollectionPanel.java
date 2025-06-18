@@ -29,8 +29,8 @@ public class CollectionPanel extends JPanel {
 
         List<JComponent> components = new ArrayList<>();
 
+        // Add Upload button first for Images tab only
         if (type.equals("Image")) {
-            // Upload Button
             JButton uploadBtn = new JButton("Upload");
             uploadBtn.setPreferredSize(new Dimension(100, 100));
             uploadBtn.addActionListener(e -> {
@@ -38,25 +38,17 @@ public class CollectionPanel extends JPanel {
                 if (newImage != null) refreshImagesTab();
             });
             components.add(uploadBtn);
+        }
 
-            // Load uploaded images
-            File[] files = new File("assets/images/").listFiles(this::isImageFile);
-            if (files != null) {
-                for (File imgFile : files) {
-                    components.add(new ImageThumbnail(imgFile.getPath()));
-                }
-            }
-
-        } else {
-            File[] files = new File("assets/" + type.toLowerCase() + "s/").listFiles(this::isImageFile);
-            if (files != null) {
-                for (File imgFile : files) {
-                    components.add(new ImageThumbnail(imgFile.getPath()));
-                }
+        // Load images based on tab type
+        File[] files = getFilesForTab(type);
+        if (files != null) {
+            for (File imgFile : files) {
+                components.add(new ImageThumbnail(imgFile.getPath()));
             }
         }
 
-        // Add components into 2-column rows
+        // Distribute thumbnails in rows of 2
         for (JComponent comp : components) {
             row.add(wrapThumbnail(comp));
             columnCount++;
@@ -67,9 +59,9 @@ public class CollectionPanel extends JPanel {
             }
         }
 
-        // If row is half-filled, pad it
+        // Add final incomplete row if needed
         if (columnCount > 0) {
-            row.add(Box.createHorizontalStrut(110)); // empty filler
+            row.add(Box.createHorizontalStrut(110)); // filler for alignment
             container.add(row);
         }
 
@@ -80,6 +72,15 @@ public class CollectionPanel extends JPanel {
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
 
         return scrollPane;
+    }
+
+    private File[] getFilesForTab(String type) {
+        String folderPath = type.equals("Image")
+                ? "assets/images/"
+                : "assets/" + type.toLowerCase() + "s/";
+
+        File folder = new File(folderPath);
+        return folder.listFiles(this::isImageFile);
     }
 
     private JPanel createRowPanel() {
