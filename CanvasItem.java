@@ -12,6 +12,22 @@ public class CanvasItem {
     private boolean flipVertical;
 
     private static final int HANDLE_SIZE = 10;
+    
+    // --- MODIFICATION START ---
+    // Load the rotation icon statically so it's only loaded once for all items.
+    private static Image rotateIcon;
+    private static final int ICON_SIZE = 24; // Define a size for the icon
+
+    static {
+        try {
+            // Load the icon from the specified path
+            rotateIcon = new ImageIcon("Icons/RotateImage.png").getImage();
+        } catch (Exception e) {
+            rotateIcon = null; // Handle case where icon is not found
+            System.err.println("Error: Could not load 'icons/RotateImage.png'");
+        }
+    }
+    // --- MODIFICATION END ---
 
     public CanvasItem(String imagePath, int x, int y) {
         ImageIcon icon = new ImageIcon(imagePath);
@@ -76,8 +92,17 @@ public class CanvasItem {
             g2.fillRect(-width / 2 - HANDLE_SIZE / 2, height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
             g2.fillRect(width / 2 - HANDLE_SIZE / 2, height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
 
-            g2.setColor(Color.RED);
-            g2.fillOval(-10, -height / 2 - 30, 20, 20);
+            // --- MODIFICATION START ---
+            // Draw the icon instead of the red circle
+            if (rotateIcon != null) {
+                // The y-position is calculated to place the icon above the item's top edge
+                g2.drawImage(rotateIcon, -ICON_SIZE / 2, -height / 2 - (ICON_SIZE + 10), ICON_SIZE, ICON_SIZE, null);
+            } else {
+                // Fallback to the red circle if the icon failed to load
+                g2.setColor(Color.RED);
+                g2.fillOval(-10, -height / 2 - 30, 20, 20);
+            }
+            // --- MODIFICATION END ---
         }
 
         g2.setTransform(old);
@@ -113,8 +138,16 @@ public class CanvasItem {
 
             AffineTransform inverseTransform = currentTransform.createInverse();
             Point2D transformedMouse = inverseTransform.transform(new Point(mx, my), null);
-
-            return new Rectangle(-10, -height / 2 - 30, 20, 20).contains(transformedMouse);
+            
+            // --- MODIFICATION START ---
+            // Update the hit detection rectangle to match the icon's position and size
+            int handleY = -height / 2 - (ICON_SIZE + 10);
+            if (rotateIcon == null) {
+                // Fallback to the old circle dimensions if icon is not present
+                 return new Rectangle(-10, -height / 2 - 30, 20, 20).contains(transformedMouse);
+            }
+            return new Rectangle(-ICON_SIZE / 2, handleY, ICON_SIZE, ICON_SIZE).contains(transformedMouse);
+            // --- MODIFICATION END ---
 
         } catch (java.awt.geom.NoninvertibleTransformException e) {
             e.printStackTrace();
