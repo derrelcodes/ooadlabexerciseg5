@@ -101,7 +101,7 @@ public class RightCanvasControls {
                 if (iconFile.exists()) { //
                     ImageIcon icon = new ImageIcon(path); //
                     if (icon.getIconWidth() > 0) { //
-                        Image img = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH); //
+                        Image img = icon.getImage().getScaledInstance(70, 70, Image.SCALE_SMOOTH); //
                         button.setIcon(new ImageIcon(img)); //
                         iconLoaded = true; //
                         break; //
