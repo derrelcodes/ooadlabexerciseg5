@@ -31,22 +31,22 @@ public class DrawingStudioPro {
 
             JPanel leftPanel = new JPanel(new BorderLayout());
 
-            JLabel leftLabel = new JLabel("Composition", SwingConstants.CENTER);
+            JLabel leftLabel = new JLabel("Composition Canvas", SwingConstants.CENTER);
             leftLabel.setFont(new Font("SansSerif", Font.BOLD, 18));
             leftLabel.setForeground(Color.WHITE);
             leftLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
             JPanel topLeftPanel = new JPanel(new BorderLayout());
             topLeftPanel.setBackground(new Color(45, 45, 45));
+            JPanel leftControls = LeftCanvasControls.createButtonPanel(leftCanvas); // Get controls
             topLeftPanel.add(leftLabel, BorderLayout.NORTH);
-            topLeftPanel.add(LeftCanvasControls.createButtonPanel(leftCanvas), BorderLayout.CENTER);
+            topLeftPanel.add(leftControls, BorderLayout.CENTER); // Add controls
 
             leftPanel.add(topLeftPanel, BorderLayout.NORTH);
             leftPanel.add(leftCanvas, BorderLayout.CENTER);
-            // ADD THIS LINE: Add the new bottom panel to the SOUTH of the leftPanel
-            leftPanel.add(LeftCanvasControls.createBottomPanel(leftCanvas), BorderLayout.SOUTH); //
+            leftPanel.add(LeftCanvasControls.createBottomPanel(leftCanvas), BorderLayout.SOUTH);
 
-            // RIGHT PANEL: "Drawing Pad" (remains unchanged)
+            // RIGHT PANEL: "Drawing Pad"
             RightCanvas rightCanvas = new RightCanvas();
             rightCanvas.setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY, 5));
 
@@ -59,8 +59,9 @@ public class DrawingStudioPro {
 
             JPanel topRightPanel = new JPanel(new BorderLayout());
             topRightPanel.setBackground(new Color(45, 45, 45));
+            JPanel rightControls = RightCanvasControls.createTopPanel(rightCanvas); // Get controls
             topRightPanel.add(rightLabel, BorderLayout.NORTH);
-            topRightPanel.add(RightCanvasControls.createTopPanel(rightCanvas), BorderLayout.CENTER);
+            topRightPanel.add(rightControls, BorderLayout.CENTER); // Add controls
 
             rightPanel.add(topRightPanel, BorderLayout.NORTH);
             rightPanel.add(rightCanvas, BorderLayout.CENTER);
@@ -74,9 +75,20 @@ public class DrawingStudioPro {
             add(mediaPanel, BorderLayout.WEST);
             add(canvasSplitPane, BorderLayout.CENTER);
 
-            setSize(1200, 700);
+            // Make the window open in full-screen mode
+            setExtendedState(JFrame.MAXIMIZED_BOTH);
+            setSize(1200, 700); // Fallback size
             setLocationRelativeTo(null);
             setVisible(true);
+
+            // Set divider location and minimum panel sizes after frame is visible
+            SwingUtilities.invokeLater(() -> {
+                // Limit slider movement by setting minimum panel sizes
+                leftPanel.setMinimumSize(new Dimension(leftControls.getPreferredSize().width + 30, 0));
+                rightPanel.setMinimumSize(new Dimension(rightControls.getPreferredSize().width + 30, 0));
+                // Set the divider to be exactly in the middle on startup
+                canvasSplitPane.setDividerLocation(0.5);
+            });
         }
     }
 }

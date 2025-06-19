@@ -8,8 +8,8 @@ public class CanvasItem {
     private int x, y, width, height;
     private double rotationAngle;
     private boolean isSelected;
-    private boolean flipHorizontal; // New field for horizontal flip state
-    private boolean flipVertical;   // New field for vertical flip state
+    private boolean flipHorizontal;
+    private boolean flipVertical;
 
     private static final int HANDLE_SIZE = 10;
 
@@ -22,17 +22,26 @@ public class CanvasItem {
         this.height = 100;
         this.rotationAngle = 0;
         this.isSelected = false;
-        this.flipHorizontal = false; // Initialize flip states
-        this.flipVertical = false;   // Initialize flip states
+        this.flipHorizontal = false;
+        this.flipVertical = false;
     }
 
-    public boolean isSelected() {
-        return isSelected;
-    }
+    // --- Getters and Setters ---
+    public int getX() { return x; }
+    public int getY() { return y; }
+    public int getWidth() { return width; }
+    public int getHeight() { return height; }
+    public boolean isSelected() { return isSelected; }
 
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+    
     public void setSelected(boolean selected) {
         this.isSelected = selected;
     }
+    // -------------------------
 
     public void draw(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
@@ -44,22 +53,17 @@ public class CanvasItem {
         g2.translate(x + width / 2, y + height / 2);
         g2.rotate(Math.toRadians(rotationAngle));
 
-        // Apply flip transformations
-        int drawWidth = width;
-        int drawHeight = height;
         int drawX = -width / 2;
         int drawY = -height / 2;
 
         if (flipHorizontal) {
             g2.scale(-1, 1);
-            drawX = -width / 2; // Keep drawing at original x for mirroring around center
         }
         if (flipVertical) {
             g2.scale(1, -1);
-            drawY = -height / 2; // Keep drawing at original y for mirroring around center
         }
 
-        g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+        g2.drawImage(image, drawX, drawY, width, height, null);
 
         if (isSelected) {
             g2.setColor(Color.CYAN);
@@ -88,9 +92,7 @@ public class CanvasItem {
             if (flipHorizontal) currentTransform.scale(-1, 1);
             if (flipVertical) currentTransform.scale(1, -1);
 
-            AffineTransform inverseTransform = currentTransform;
-            inverseTransform.invert();
-
+            AffineTransform inverseTransform = currentTransform.createInverse();
             Point2D transformedMouse = inverseTransform.transform(new Point(mx, my), null);
 
             return new Rectangle(-width / 2, -height / 2, width, height).contains(transformedMouse);
@@ -109,9 +111,7 @@ public class CanvasItem {
             if (flipHorizontal) currentTransform.scale(-1, 1);
             if (flipVertical) currentTransform.scale(1, -1);
 
-            AffineTransform inverseTransform = currentTransform;
-            inverseTransform.invert();
-
+            AffineTransform inverseTransform = currentTransform.createInverse();
             Point2D transformedMouse = inverseTransform.transform(new Point(mx, my), null);
 
             return new Rectangle(-10, -height / 2 - 30, 20, 20).contains(transformedMouse);
@@ -130,12 +130,9 @@ public class CanvasItem {
             if (flipHorizontal) currentTransform.scale(-1, 1);
             if (flipVertical) currentTransform.scale(1, -1);
 
-            AffineTransform inverseTransform = currentTransform;
-            inverseTransform.invert();
-
+            AffineTransform inverseTransform = currentTransform.createInverse();
             Point2D transformedMouse = inverseTransform.transform(new Point(mx, my), null);
 
-            // Check against local coordinates of resize handles
             Rectangle tlHandle = new Rectangle(-width / 2 - HANDLE_SIZE / 2, -height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
             Rectangle trHandle = new Rectangle(width / 2 - HANDLE_SIZE / 2, -height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
             Rectangle blHandle = new Rectangle(-width / 2 - HANDLE_SIZE / 2, height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
@@ -152,18 +149,10 @@ public class CanvasItem {
             return null;
         }
     }
-
-    public void move(int dx, int dy) {
-        x += dx;
-        y += dy;
-    }
-
+    
     public void resize(String handleType, int dx, int dy) {
         final int MIN_SIZE = 20;
 
-        // Note: Resizing with flips active can be complex.
-        // For simplicity, this resize logic assumes positive width/height changes.
-        // For more robust behavior, you might need to adjust dx/dy based on flip state.
         switch (handleType) {
             case "BR":
                 width = Math.max(MIN_SIZE, width + (flipHorizontal ? -dx : dx));
@@ -191,16 +180,13 @@ public class CanvasItem {
                 width = newWidthBL;
                 height = newHeightBL;
                 break;
-            default:
-                break;
         }
     }
 
     public void rotate(int deltaAngle) {
         rotationAngle += deltaAngle;
     }
-
-    // New methods for flipping
+    
     public void flipVertical() {
         this.flipVertical = !this.flipVertical;
     }
