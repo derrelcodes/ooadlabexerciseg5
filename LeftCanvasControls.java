@@ -11,7 +11,7 @@ public class LeftCanvasControls {
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5)); //
 
         // Create buttons using the new icon/label helpers
-        JButton rotateBtn = createIconButton("Rotate.png"); // Assuming Rotate.png exists
+        JButton rotateBtn = createIconButton("RotateAll.png"); // Assuming Rotate.png exists
         JButton deleteBtn = createIconButton("Delete.png"); // Assuming Delete.png exists
         JButton saveBtn = createIconButton("Save.png");     // Assuming Save.png exists
         JButton flipVerticalBtn = createIconButton("FlipVertical.png"); // Assuming FlipVertical.png exists
