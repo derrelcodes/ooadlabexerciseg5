@@ -62,7 +62,7 @@ public class RightCanvasControls {
         bottomPanel.setBackground(new Color(45, 45, 45));
         bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
 
-        JButton clearButton = new JButton("Clear Canvas");
+        JButton clearButton = new JButton("Clear Drawing");
         clearButton.setBackground(new Color(220, 53, 69));
         clearButton.setForeground(Color.WHITE);
         clearButton.setFocusPainted(false);
