@@ -1,13 +1,18 @@
+// derrelcodes/ooadlabexerciseg5/ooadlabexerciseg5-main/ImageThumbnail.java
 import javax.swing.*;
 import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ImageThumbnail extends JButton {
-    private String imagePath;
+    private final String imagePath;
+    private final String itemType;
 
-    public ImageThumbnail(String imagePath) {
+    public ImageThumbnail(String imagePath, String itemType) {
         this.imagePath = imagePath;
+        this.itemType = itemType;
 
         ImageIcon icon = new ImageIcon(imagePath);
         Image scaled = icon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
@@ -22,7 +27,8 @@ public class ImageThumbnail extends JButton {
         setTransferHandler(new TransferHandler() {
             @Override
             protected Transferable createTransferable(JComponent c) {
-                return new StringSelection(imagePath);
+                // We now transfer a formatted string: "TYPE:PATH"
+                return new StringSelection(itemType + ":" + imagePath);
             }
 
             @Override
@@ -38,9 +44,5 @@ public class ImageThumbnail extends JButton {
                 handler.exportAsDrag(comp, e, TransferHandler.COPY);
             }
         });
-    }
-
-    public String getImagePath() {
-        return imagePath;
     }
 }

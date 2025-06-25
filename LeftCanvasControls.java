@@ -1,3 +1,4 @@
+// derrelcodes/ooadlabexercisegeg5/ooadlabexerciseg5-main/LeftCanvasControls.java
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -5,78 +6,67 @@ import java.io.File;
 
 public class LeftCanvasControls {
     public static JPanel createButtonPanel(LeftCanvas canvas) {
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
         buttonPanel.setBackground(new Color(45, 45, 45));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        // Create buttons
-        JButton rotateBtn = createIconButton("RotateAll.png");
-        JButton deleteBtn = createIconButton("Delete.png");
-        JButton saveBtn = createIconButton("Save.png");
-        JButton flipVerticalBtn = createIconButton("FlipVertical.png");
-        JButton flipHorizontalBtn = createIconButton("FlipHorizontal.png");
+        // Create buttons (Animal and Flower buttons removed)
+        JButton composeBtn = createIconButton("icons/Compose.png", "Compose");
+        JButton rotateBtn = createIconButton("icons/RotateAll.png", "Rotate");
+        JButton saveBtn = createIconButton("icons/Save.png", "Save");
+        JButton flipVerticalBtn = createIconButton("icons/FlipVertical.png", "FlipV");
+        JButton flipHorizontalBtn = createIconButton("icons/FlipHorizontal.png", "FlipH");
+        JButton deleteBtn = createIconButton("icons/Delete.png", "Delete");
 
         // Set tooltips for hover text
-        rotateBtn.setToolTipText("Rotate Canvas");
-        deleteBtn.setToolTipText("Delete Selected Image");
+        composeBtn.setToolTipText("Compose Canvas");
+        rotateBtn.setToolTipText("Rotate All Items");
         saveBtn.setToolTipText("Save Composition");
-        flipVerticalBtn.setToolTipText("Flip Selected Image Vertically");
-        flipHorizontalBtn.setToolTipText("Flip Selected Image Horizontally");
+        flipVerticalBtn.setToolTipText("Flip Selected Item Vertically");
+        flipHorizontalBtn.setToolTipText("Flip Selected Item Horizontally");
+        deleteBtn.setToolTipText("Delete Selected Item");
 
         // Apply action listeners
-        rotateBtn.addActionListener((ActionEvent e) -> canvas.rotateCanvas());
-        deleteBtn.addActionListener((ActionEvent e) -> canvas.deleteSelectedItem());
-        saveBtn.addActionListener((ActionEvent e) -> canvas.saveCanvasAsImage());
+        composeBtn.addActionListener(e -> canvas.composeCanvas());
+        rotateBtn.addActionListener(e -> canvas.rotateCanvas());
+        saveBtn.addActionListener(e -> canvas.saveCanvasAsImage());
         flipVerticalBtn.addActionListener(e -> canvas.flipSelectedVertical());
         flipHorizontalBtn.addActionListener(e -> canvas.flipSelectedHorizontal());
+        deleteBtn.addActionListener(e -> canvas.deleteSelectedItem());
 
-        // Add buttons directly to the panel
+        // Add buttons to the panel
+        buttonPanel.add(composeBtn);
         buttonPanel.add(rotateBtn);
-        buttonPanel.add(deleteBtn);
         buttonPanel.add(saveBtn);
         buttonPanel.add(flipVerticalBtn);
         buttonPanel.add(flipHorizontalBtn);
+        buttonPanel.add(deleteBtn);
 
         return buttonPanel;
     }
 
-    private static JButton createIconButton(String iconPath) {
+    private static JButton createIconButton(String iconPath, String fallbackText) {
         JButton button = new JButton();
-        button.setPreferredSize(new Dimension(56, 56));
+        button.setPreferredSize(new Dimension(50, 50));
         button.setBackground(new Color(70, 70, 70));
         button.setBorder(BorderFactory.createRaisedBevelBorder());
         button.setFocusPainted(false);
         button.setMargin(new Insets(4, 4, 4, 4));
 
-        boolean iconLoaded = false;
-        String[] possiblePaths = {
-            "icons/" + iconPath,
-            "src/icons/" + iconPath,
-            "resources/" + iconPath,
-            iconPath,
-            System.getProperty("user.dir") + "/" + iconPath
-        };
-
-        for (String path : possiblePaths) {
-            try {
-                File iconFile = new File(path);
-                if (iconFile.exists()) {
-                    ImageIcon icon = new ImageIcon(path);
-                    if (icon.getIconWidth() > 0) {
-                        Image img = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
-                        button.setIcon(new ImageIcon(img));
-                        iconLoaded = true;
-                        break;
-                    }
-                }
-            } catch (Exception ignored) {}
-        }
-
-        if (!iconLoaded) {
-            button.setText("?");
+        try {
+            File iconFile = new File(iconPath);
+            if (iconFile.exists()) {
+                ImageIcon icon = new ImageIcon(iconPath);
+                Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                button.setIcon(new ImageIcon(img));
+            } else {
+                throw new Exception("Icon not found");
+            }
+        } catch (Exception e) {
+            button.setText(fallbackText);
             button.setForeground(Color.WHITE);
-            button.setFont(new Font("Arial", Font.BOLD, 16));
-            System.out.println("Icon not found for " + iconPath + ", using text fallback");
+            button.setFont(new Font("Arial", Font.BOLD, 10));
+            System.err.println("Icon not found for " + iconPath + ", using text fallback.");
         }
 
         button.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -115,8 +105,7 @@ public class LeftCanvasControls {
             int confirm = JOptionPane.showConfirmDialog(null,
                     "Are you sure you want to clear the composition? This action cannot be undone.",
                     "Clear Composition",
-                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE
-            );
+                    JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (confirm == JOptionPane.YES_OPTION) {
                 canvas.clearCanvas();
             }

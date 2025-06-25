@@ -1,143 +1,62 @@
-import java.awt.*;
-import javax.swing.*;
+// derrelcodes/ooadlabexerciseg5/ooadlabexerciseg5-main/RightCanvasControls.java
 import javax.imageio.ImageIO;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 public class RightCanvasControls {
     private static RightCanvas canvas;
+    private static CollectionPanel collectionPanel;
     private static JButton penButton, eraserButton, colorButton, penSizeButton, saveButton;
 
-    public static JPanel createTopPanel(RightCanvas canvasRef) {
+    public static JPanel createTopPanel(RightCanvas canvasRef, CollectionPanel collectionPanelRef) {
         canvas = canvasRef;
+        collectionPanel = collectionPanelRef;
+
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 5));
         topPanel.setBackground(new Color(45, 45, 45));
         topPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        penButton = createIconButton("Pen.png");
-        eraserButton = createIconButton("Eraser.png");
-        colorButton = createIconButton("Pen Colour.png");
-        penSizeButton = createIconButton("Pen Size.png");
-        saveButton = createIconButton("Save.png");
+        penButton = createIconButton("icons/Pen.png", "Pen");
+        eraserButton = createIconButton("icons/Eraser.png", "Erase");
+        colorButton = createIconButton("icons/Pen Colour.png", "Color");
+        penSizeButton = createIconButton("icons/Pen Size.png", "Size");
+        saveButton = createIconButton("icons/Save.png", "Save");
 
-        // Set tooltips for hover text
         penButton.setToolTipText("Pen");
         eraserButton.setToolTipText("Eraser");
-        colorButton.setToolTipText("Color");
+        colorButton.setToolTipText("Color Picker");
         penSizeButton.setToolTipText("Pen Size");
-        saveButton.setToolTipText("Save");
+        saveButton.setToolTipText("Save Drawing");
 
         penButton.addActionListener(e -> {
-            if (canvas != null) {
-                canvas.setEraser(false);
-                updateButtonStates();
-            }
+            canvas.setEraser(false);
+            updateButtonStates();
         });
-
         eraserButton.addActionListener(e -> {
-            if (canvas != null) {
-                canvas.setEraser(true);
-                updateButtonStates();
-            }
+            canvas.setEraser(true);
+            updateButtonStates();
         });
 
+        // Use your original color picker
         colorButton.addActionListener(e -> showSimpleColorPicker());
         penSizeButton.addActionListener(e -> showPenSizePicker());
         saveButton.addActionListener(e -> saveDrawing());
 
-        // Add buttons directly to the panel
         topPanel.add(penButton);
         topPanel.add(eraserButton);
         topPanel.add(colorButton);
         topPanel.add(penSizeButton);
         topPanel.add(saveButton);
 
+        updateButtonStates();
         return topPanel;
     }
 
-    public static JPanel createBottomPanel() {
-        JPanel bottomPanel = new JPanel(new BorderLayout());
-        bottomPanel.setBackground(new Color(45, 45, 45));
-        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-
-        JButton clearButton = new JButton("Clear Drawing");
-        clearButton.setBackground(new Color(220, 53, 69));
-        clearButton.setForeground(Color.WHITE);
-        clearButton.setFocusPainted(false);
-        clearButton.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        clearButton.setFont(new Font("Arial", Font.BOLD, 14));
-
-        clearButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                clearButton.setBackground(new Color(255, 80, 90));
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                clearButton.setBackground(new Color(220, 53, 69));
-            }
-        });
-
-        clearButton.addActionListener(e -> clearCanvas());
-        bottomPanel.add(clearButton, BorderLayout.EAST);
-        return bottomPanel;
-    }
-
-    private static JButton createIconButton(String iconPath) {
-        JButton button = new JButton();
-        button.setPreferredSize(new Dimension(56, 56));
-        button.setBackground(new Color(70, 70, 70));
-        button.setBorder(BorderFactory.createRaisedBevelBorder());
-        button.setFocusPainted(false);
-        button.setMargin(new Insets(4, 4, 4, 4));
-
-        boolean iconLoaded = false;
-        String[] possiblePaths = {
-            "icons/" + iconPath,
-            "src/icons/" + iconPath,
-            "resources/" + iconPath,
-            iconPath,
-            System.getProperty("user.dir") + "/" + iconPath
-        };
-
-        for (String path : possiblePaths) {
-            try {
-                File iconFile = new File(path);
-                if (iconFile.exists()) {
-                    ImageIcon icon = new ImageIcon(path);
-                    if (icon.getIconWidth() > 0) {
-                        Image img = icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH);
-                        button.setIcon(new ImageIcon(img));
-                        iconLoaded = true;
-                        break;
-                    }
-                }
-            } catch (Exception ignored) {}
-        }
-
-        if (!iconLoaded) {
-            button.setText("?");
-            button.setForeground(Color.WHITE);
-            button.setFont(new Font("Arial", Font.BOLD, 16));
-            System.out.println("Icon not found for " + iconPath + ", using text fallback");
-        }
-
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(90, 90, 90));
-            }
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                if ((button == penButton && !canvas.isEraser()) ||
-                    (button == eraserButton && canvas.isEraser())) {
-                    button.setBackground(new Color(100, 150, 100));
-                } else {
-                    button.setBackground(new Color(70, 70, 70));
-                }
-            }
-        });
-        return button;
-    }
-
+    // THIS IS YOUR ORIGINAL COLOR PICKER CODE
     private static void showSimpleColorPicker() {
         if (canvas != null) {
             JDialog colorDialog = new JDialog((Frame) null, "Choose Color", true);
@@ -185,7 +104,6 @@ public class RightCanvasControls {
                         colorButton.setBorder(BorderFactory.createRaisedBevelBorder());
                     }
                 });
-
                 colorGrid.add(colorButton);
             }
 
@@ -203,19 +121,12 @@ public class RightCanvasControls {
         if (canvas != null) {
             String[] sizes = {"1", "2", "3", "5", "8", "10", "15", "20", "25", "30"};
             String selectedSize = (String) JOptionPane.showInputDialog(
-                null,
-                "Select Pen Size:",
-                "Pen Size",
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                sizes,
-                String.valueOf(canvas.getStrokeSize())
+                null, "Select Pen Size:", "Pen Size",
+                JOptionPane.QUESTION_MESSAGE, null, sizes, String.valueOf(canvas.getStrokeSize())
             );
-
             if (selectedSize != null) {
                 try {
-                    int size = Integer.parseInt(selectedSize);
-                    canvas.setStrokeSize(size);
+                    canvas.setStrokeSize(Integer.parseInt(selectedSize));
                 } catch (NumberFormatException e) {
                     JOptionPane.showMessageDialog(null, "Invalid size value!", "Error", JOptionPane.ERROR_MESSAGE);
                 }
@@ -224,38 +135,69 @@ public class RightCanvasControls {
     }
 
     private static void saveDrawing() {
-        if (canvas != null) {
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Save Drawing");
-            fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("PNG Images", "png"));
+        if (canvas == null) return;
+        Object[] options = {"Save to Library", "Save to File...", "Cancel"};
+        int choice = JOptionPane.showOptionDialog(null,
+                "Where would you like to save this drawing?", "Save Drawing",
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE,
+                null, options, options[0]);
 
-            int userSelection = fileChooser.showSaveDialog(null);
+        if (choice == JOptionPane.YES_OPTION) {
+            saveToLibrary();
+        } else if (choice == JOptionPane.NO_OPTION) {
+            saveToFile();
+        }
+    }
 
-            if (userSelection == JFileChooser.APPROVE_OPTION) {
-                File fileToSave = fileChooser.getSelectedFile();
-                if (!fileToSave.getName().toLowerCase().endsWith(".png")) {
-                    fileToSave = new File(fileToSave.getAbsolutePath() + ".png");
-                }
+    private static void saveToLibrary() {
+        File assetsDir = new File("assets/images");
+        if (!assetsDir.exists()) assetsDir.mkdirs();
+        String fileName = "drawing_" + UUID.randomUUID().toString().substring(0, 8) + ".png";
+        File fileToSave = new File(assetsDir, fileName);
+        try {
+            ImageIO.write(canvas.getCanvasImage(), "PNG", fileToSave);
+            JOptionPane.showMessageDialog(null, "Drawing saved to library successfully!", "Save Complete", JOptionPane.INFORMATION_MESSAGE);
+            if (collectionPanel != null) collectionPanel.refreshImagesTab();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Error saving to library: " + e.getMessage(), "Save Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
-                try {
-                    ImageIO.write(canvas.getCanvasImage(), "PNG", fileToSave);
-                    JOptionPane.showMessageDialog(null, "Drawing saved successfully!", "Save Complete", JOptionPane.INFORMATION_MESSAGE);
-                } catch (IOException e) {
-                    JOptionPane.showMessageDialog(null, "Error saving drawing: " + e.getMessage(), "Save Error", JOptionPane.ERROR_MESSAGE);
-                }
+    private static void saveToFile() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Drawing to File");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("PNG Images", "png"));
+        if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            if (!fileToSave.getName().toLowerCase().endsWith(".png")) {
+                fileToSave = new File(fileToSave.getAbsolutePath() + ".png");
+            }
+            try {
+                ImageIO.write(canvas.getCanvasImage(), "PNG", fileToSave);
+                JOptionPane.showMessageDialog(null, "Drawing saved successfully!", "Save Complete", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException e) {
+                JOptionPane.showMessageDialog(null, "Error saving drawing: " + e.getMessage(), "Save Error", JOptionPane.ERROR_MESSAGE);
             }
         }
+    }
+    
+    public static JPanel createBottomPanel() {
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        bottomPanel.setBackground(new Color(45, 45, 45));
+        bottomPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        JButton clearButton = new JButton("Clear Drawing");
+        clearButton.setBackground(new Color(220, 53, 69));
+        clearButton.setForeground(Color.WHITE);
+        clearButton.addActionListener(e -> clearCanvas());
+        bottomPanel.add(clearButton, BorderLayout.EAST);
+        return bottomPanel;
     }
 
     private static void clearCanvas() {
         if (canvas != null) {
-            int result = JOptionPane.showConfirmDialog(
-                null,
-                "Are you sure you want to clear the drawing? This action cannot be undone.",
-                "Clear Drawing",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.WARNING_MESSAGE
-            );
+            int result = JOptionPane.showConfirmDialog(null,
+                    "Are you sure you want to clear the drawing? This action cannot be undone.",
+                    "Clear Drawing", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (result == JOptionPane.YES_OPTION) {
                 canvas.clearCanvas();
             }
@@ -263,35 +205,29 @@ public class RightCanvasControls {
     }
 
     private static void updateButtonStates() {
-        if (canvas != null) {
-            if (penButton != null && eraserButton != null) {
-                if (canvas.isEraser()) {
-                    eraserButton.setBackground(new Color(100, 150, 100));
-                    penButton.setBackground(new Color(70, 70, 70));
-                } else {
-                    penButton.setBackground(new Color(100, 150, 100));
-                    eraserButton.setBackground(new Color(70, 70, 70));
-                }
-            }
+        if (canvas != null && penButton != null && eraserButton != null) {
+            penButton.setBackground(!canvas.isEraser() ? new Color(100, 150, 100) : new Color(70, 70, 70));
+            eraserButton.setBackground(canvas.isEraser() ? new Color(100, 150, 100) : new Color(70, 70, 70));
         }
     }
 
-    private static String getColorName(Color color) {
-        if (color.equals(Color.BLACK)) return "Black";
-        if (color.equals(Color.WHITE)) return "White";
-        if (color.equals(Color.RED)) return "Red";
-        if (color.equals(Color.GREEN)) return "Green";
-        if (color.equals(Color.BLUE)) return "Blue";
-        if (color.equals(Color.YELLOW)) return "Yellow";
-        if (color.equals(Color.ORANGE)) return "Orange";
-        if (color.equals(Color.PINK)) return "Pink";
-        if (color.equals(Color.CYAN)) return "Cyan";
-        if (color.equals(Color.MAGENTA)) return "Magenta";
-        return "RGB(" + color.getRed() + "," + color.getGreen() + "," + color.getBlue() + ")";
-    }
-
-    public static void setCanvas(RightCanvas canvasRef) {
-        canvas = canvasRef;
-        updateButtonStates();
+    private static JButton createIconButton(String iconPath, String fallbackText) {
+        JButton button = new JButton();
+        button.setPreferredSize(new Dimension(56, 56));
+        button.setBackground(new Color(70, 70, 70));
+        button.setBorder(BorderFactory.createRaisedBevelBorder());
+        button.setFocusPainted(false);
+        try {
+            ImageIcon icon = new ImageIcon(iconPath);
+            button.setIcon(new ImageIcon(icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH)));
+        } catch (Exception e) {
+            button.setText(fallbackText);
+            button.setForeground(Color.WHITE);
+        }
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) { button.setBackground(new Color(90, 90, 90)); }
+            public void mouseExited(java.awt.event.MouseEvent evt) { updateButtonStates(); }
+        });
+        return button;
     }
 }
