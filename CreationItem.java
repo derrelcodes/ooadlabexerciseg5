@@ -14,6 +14,7 @@ public abstract class CreationItem {
     protected boolean flipVertical;
 
     private static final int HANDLE_SIZE = 10;
+    // MODIFICATION: Direct path to icon
     private static final Image rotateIcon = new ImageIcon("icons/RotateImage.png").getImage();
     private static final int ICON_SIZE = 24;
 
@@ -29,41 +30,29 @@ public abstract class CreationItem {
         this.flipVertical = false;
     }
 
-    // --- Abstract methods for capabilities ---
     public abstract boolean canFlip();
     public abstract boolean canScale();
     public abstract boolean canTranspose();
+    public boolean isBackgroundLayer() { return false; }
 
-    // NEW METHOD: To check if the item is a locked background layer
-    public boolean isBackgroundLayer() {
-        return false;
-    }
-
-    // --- Common Drawing and Interaction Logic ---
     public void draw(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
         AffineTransform oldTransform = g2.getTransform();
         g2.translate(x + width / 2.0, y + height / 2.0);
         g2.rotate(Math.toRadians(rotationAngle));
-
         AffineTransform flipTransform = new AffineTransform();
         if (flipHorizontal) flipTransform.scale(-1, 1);
         if (flipVertical) flipTransform.scale(1, -1);
         g2.transform(flipTransform);
-
         g2.drawImage(image, -width / 2, -height / 2, width, height, null);
-
         if (isSelected) {
             g2.setTransform(oldTransform);
             g2.translate(x + width / 2.0, y + height / 2.0);
             g2.rotate(Math.toRadians(rotationAngle));
-
             g2.setColor(Color.CYAN);
             g2.setStroke(new BasicStroke(2));
             g2.drawRect(-width / 2, -height / 2, width, height);
-
             if (canScale()) {
                 g2.setColor(Color.BLUE);
                 g2.fillRect(-width / 2 - HANDLE_SIZE / 2, -height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
@@ -71,8 +60,7 @@ public abstract class CreationItem {
                 g2.fillRect(-width / 2 - HANDLE_SIZE / 2, height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
                 g2.fillRect(width / 2 - HANDLE_SIZE / 2, height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE);
             }
-
-            if (rotateIcon != null) {
+            if (rotateIcon != null && rotateIcon.getWidth(null) > 0) {
                 g2.drawImage(rotateIcon, -ICON_SIZE / 2, -height / 2 - (ICON_SIZE + 10), ICON_SIZE, ICON_SIZE, null);
             } else {
                 g2.setColor(Color.RED);
@@ -81,7 +69,8 @@ public abstract class CreationItem {
         }
         g2.dispose();
     }
-
+    
+    // ... other methods remain the same
     private AffineTransform getInverseTransform() throws NoninvertibleTransformException {
         AffineTransform currentTransform = new AffineTransform();
         currentTransform.translate(x + width / 2.0, y + height / 2.0);
@@ -95,9 +84,7 @@ public abstract class CreationItem {
         try {
             Point2D transformedMouse = getInverseTransform().transform(new Point(mx, my), null);
             return new Rectangle(-width / 2, -height / 2, width, height).contains(transformedMouse);
-        } catch (NoninvertibleTransformException e) {
-            return false;
-        }
+        } catch (NoninvertibleTransformException e) { return false; }
     }
 
     public boolean onRotateHandle(int mx, int my) {
@@ -109,9 +96,7 @@ public abstract class CreationItem {
             Point2D transformedMouse = inverseNoFlip.createInverse().transform(new Point(mx, my), null);
             int handleY = -height / 2 - (ICON_SIZE + 10);
             return new Rectangle(-ICON_SIZE / 2, handleY, ICON_SIZE, ICON_SIZE).contains(transformedMouse);
-        } catch (NoninvertibleTransformException e) {
-            return false;
-        }
+        } catch (NoninvertibleTransformException e) { return false; }
     }
 
     public String getResizeHandle(int mx, int my) {
@@ -123,29 +108,18 @@ public abstract class CreationItem {
             if (new Rectangle(-width / 2 - HANDLE_SIZE / 2, height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE).contains(transformedMouse)) return "BL";
             if (new Rectangle(width / 2 - HANDLE_SIZE / 2, height / 2 - HANDLE_SIZE / 2, HANDLE_SIZE, HANDLE_SIZE).contains(transformedMouse)) return "BR";
             return null;
-        } catch (NoninvertibleTransformException e) {
-            return null;
-        }
+        } catch (NoninvertibleTransformException e) { return null; }
     }
 
     public int getX() { return x; }
     public int getY() { return y; }
     public int getWidth() { return width; }
     public int getHeight() { return height; }
-
-    public void setPosition(int x, int y) {
-        if (canTranspose()) {
-            this.x = x;
-            this.y = y;
-        }
-    }
-
+    public void setPosition(int x, int y) { if (canTranspose()) { this.x = x; this.y = y; } }
     public void setSelected(boolean selected) { this.isSelected = selected; }
     public void rotate(double deltaAngle) { this.rotationAngle += deltaAngle; }
-
     public void flipVertical() { if (canFlip()) this.flipVertical = !this.flipVertical; }
     public void flipHorizontal() { if (canFlip()) this.flipHorizontal = !this.flipHorizontal; }
-
     public void resize(String handleType, int dx, int dy) {
         if (!canScale()) return;
         final int MIN_SIZE = 20;
@@ -154,7 +128,6 @@ public abstract class CreationItem {
         double sinA = Math.sin(-angleRad);
         int rotatedDx = (int) (dx * cosA - dy * sinA);
         int rotatedDy = (int) (dx * sinA + dy * cosA);
-
         switch (handleType) {
             case "BR":
                 width = Math.max(MIN_SIZE, width + (flipHorizontal ? -rotatedDx : rotatedDx));
@@ -163,20 +136,17 @@ public abstract class CreationItem {
             case "TL":
                 int newWidthTL = Math.max(MIN_SIZE, width - (flipHorizontal ? -rotatedDx : rotatedDx));
                 int newHeightTL = Math.max(MIN_SIZE, height - (flipVertical ? -rotatedDy : rotatedDy));
-                x += (width - newWidthTL); y += (height - newHeightTL);
-                width = newWidthTL; height = newHeightTL;
+                x += (width - newWidthTL); y += (height - newHeightTL); width = newWidthTL; height = newHeightTL;
                 break;
             case "TR":
                 int newWidthTR = Math.max(MIN_SIZE, width + (flipHorizontal ? -rotatedDx : rotatedDx));
                 int newHeightTR = Math.max(MIN_SIZE, height - (flipVertical ? -rotatedDy : rotatedDy));
-                y += (height - newHeightTR);
-                width = newWidthTR; height = newHeightTR;
+                y += (height - newHeightTR); width = newWidthTR; height = newHeightTR;
                 break;
             case "BL":
                 int newWidthBL = Math.max(MIN_SIZE, width - (flipHorizontal ? -rotatedDx : rotatedDx));
                 int newHeightBL = Math.max(MIN_SIZE, height + (flipVertical ? -rotatedDy : rotatedDy));
-                x += (width - newWidthBL);
-                width = newWidthBL; height = newHeightBL;
+                x += (width - newWidthBL); width = newWidthBL; height = newHeightBL;
                 break;
         }
     }
