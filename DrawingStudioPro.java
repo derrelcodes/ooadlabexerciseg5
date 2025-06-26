@@ -33,7 +33,8 @@ public class DrawingStudioPro {
             leftLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             JPanel topLeftPanel = new JPanel(new BorderLayout());
             topLeftPanel.setBackground(new Color(45, 45, 45));
-            JPanel leftControls = LeftCanvasControls.createButtonPanel(leftCanvas);
+            // MODIFICATION: Pass collectionPanel to the left controls
+            JPanel leftControls = LeftCanvasControls.createButtonPanel(leftCanvas, collectionPanel);
             topLeftPanel.add(leftLabel, BorderLayout.NORTH);
             topLeftPanel.add(leftControls, BorderLayout.CENTER);
             leftPanel.add(topLeftPanel, BorderLayout.NORTH);
@@ -50,7 +51,6 @@ public class DrawingStudioPro {
             rightLabel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             JPanel topRightPanel = new JPanel(new BorderLayout());
             topRightPanel.setBackground(new Color(45, 45, 45));
-            // MODIFICATION: Pass collectionPanel to the right controls
             JPanel rightControls = RightCanvasControls.createTopPanel(rightCanvas, collectionPanel);
             topRightPanel.add(rightLabel, BorderLayout.NORTH);
             topRightPanel.add(rightControls, BorderLayout.CENTER);
