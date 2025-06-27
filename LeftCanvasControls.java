@@ -1,8 +1,6 @@
 // derrelcodes/ooadlabexerciseg5/ooadlabexerciseg5-main/LeftCanvasControls.java
-import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
+import javax.swing.*;
 
 public class LeftCanvasControls {
     private static LeftCanvas canvas;
@@ -12,7 +10,7 @@ public class LeftCanvasControls {
         canvas = canvasRef;
         collectionPanel = collectionPanelRef;
 
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 5));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER,  15, 5));
         buttonPanel.setBackground(new Color(45, 45, 45));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -73,7 +71,7 @@ public class LeftCanvasControls {
 
         ImageIcon icon = new ImageIcon(iconPath);
         if (icon.getIconWidth() > 0) {
-            Image img = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            Image img = icon.getImage().getScaledInstance(70, 50, Image.SCALE_SMOOTH);
             button.setIcon(new ImageIcon(img));
         } else {
             button.setText(fallbackText);
