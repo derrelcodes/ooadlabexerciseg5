@@ -1,4 +1,4 @@
-// derrelcodes/ooadlabexerciseg5/ooadlabexerciseg5-main/RightCanvas.java
+// derrelcodes/ooadlabexercisegG5/ooadlabexerciseg5-version-reqs/RightCanvas.java
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -62,23 +62,29 @@ public class RightCanvas extends JPanel {
     }
 
     private void redrawAllPaths() {
-        initCanvas(); // Re-initialize with white background
-        for (DrawingPath path : paths) {
-            g2d.setColor(path.getColor());
-            g2d.setStroke(new BasicStroke(path.isEraser() ? ERASER_SIZE : path.getStrokeSize(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-            if (path.isEraser()) {
-                g2d.setComposite(AlphaComposite.Clear);
-            } else {
-                g2d.setComposite(AlphaComposite.SrcOver);
+        // The call to initCanvas() was removed from here to fix the recursion bug.
+        // The canvas is now cleared directly before redrawing the paths.
+        if (g2d != null) {
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(0, 0, getWidth(), getHeight());
+
+            for (DrawingPath path : paths) {
+                g2d.setColor(path.getColor());
+                g2d.setStroke(new BasicStroke(path.isEraser() ? ERASER_SIZE : path.getStrokeSize(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                if (path.isEraser()) {
+                    g2d.setComposite(AlphaComposite.Clear);
+                } else {
+                    g2d.setComposite(AlphaComposite.SrcOver);
+                }
+                List<Point> points = path.getPoints();
+                for (int i = 0; i < points.size() - 1; i++) {
+                    Point p1 = points.get(i);
+                    Point p2 = points.get(i + 1);
+                    g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
+                }
             }
-            List<Point> points = path.getPoints();
-            for (int i = 0; i < points.size() - 1; i++) {
-                Point p1 = points.get(i);
-                Point p2 = points.get(i + 1);
-                g2d.drawLine(p1.x, p1.y, p2.x, p2.y);
-            }
+            g2d.setComposite(AlphaComposite.SrcOver);
         }
-        g2d.setComposite(AlphaComposite.SrcOver);
         repaint();
     }
     
@@ -155,9 +161,14 @@ public class RightCanvas extends JPanel {
     public Color getCurrentColor() { return currentColor; }
     public int getStrokeSize() { return strokeSize; }
     public BufferedImage getCanvasImage() { return canvas; }
+    
     public void clearCanvas() {
         paths.clear();
-        initCanvas();
+        if (g2d != null) {
+            g2d.setComposite(AlphaComposite.SrcOver);
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(0, 0, getWidth(), getHeight());
+        }
         repaint();
     }
 
