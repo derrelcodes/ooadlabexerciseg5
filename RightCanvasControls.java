@@ -1,11 +1,11 @@
 // derrelcodes/ooadlabexerciseg5/ooadlabexerciseg5-main/RightCanvasControls.java
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class RightCanvasControls {
     private static RightCanvas canvas;
@@ -59,7 +59,7 @@ public class RightCanvasControls {
 
         ImageIcon icon = new ImageIcon(iconPath);
         if (icon.getIconWidth() > 0) {
-            button.setIcon(new ImageIcon(icon.getImage().getScaledInstance(48, 48, Image.SCALE_SMOOTH)));
+            button.setIcon(new ImageIcon(icon.getImage().getScaledInstance(70, 50, Image.SCALE_SMOOTH)));
         } else {
             button.setText(fallbackText);
             button.setForeground(Color.WHITE);
