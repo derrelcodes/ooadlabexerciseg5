@@ -139,7 +139,10 @@ public class LeftCanvas extends JPanel {
             ImageIO.write(image, "png", tempFile);
             clearCanvas();
             CreationItem composedItem = CreationFactory.createItem("Image", tempFile.getAbsolutePath(), 0, 0);
-            
+            // ImageIcon(String) blocks until fully loaded, so the pixels are already
+            // in memory here and the temp file is no longer needed on disk.
+            tempFile.delete();
+
             // MODIFICATION: Mark the new item as a composition layer
             if (composedItem instanceof CustomImageItem) {
                 ((CustomImageItem) composedItem).setAsCompositionLayer(true);

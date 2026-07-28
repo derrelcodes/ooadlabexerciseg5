@@ -11,7 +11,7 @@ public class AnimalItem extends CreationItem {
 
     @Override
     public boolean canScale() {
-        return false; // Animals cannot be scaled
+        return true; // Animals can be scaled
     }
 
     @Override

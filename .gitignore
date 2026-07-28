@@ -1,0 +1,3 @@
+# Compiled Java classes (this project has no build tool, so javac drops
+# .class files right next to the .java sources)
+*.class

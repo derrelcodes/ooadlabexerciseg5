@@ -8,12 +8,12 @@ public class CustomImageItem extends CreationItem {
 
     @Override
     public boolean canFlip() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean canScale() {
-        return false;
+        return true;
     }
 
     @Override

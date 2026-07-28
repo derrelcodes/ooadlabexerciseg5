@@ -51,8 +51,10 @@ public class RightCanvas extends JPanel {
             if (canvas != null) {
                 newG2d.drawImage(canvas, 0, 0, null);
             }
+            Graphics2D oldG2d = g2d;
             canvas = newCanvas;
             g2d = newG2d;
+            if (oldG2d != null) oldG2d.dispose();
             redrawAllPaths();
         }
     }

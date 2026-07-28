@@ -6,7 +6,7 @@ public class FlowerItem extends CreationItem {
 
     @Override
     public boolean canFlip() {
-        return false; // Flowers cannot be flipped
+        return true; // Flowers can be flipped
     }
 
     @Override

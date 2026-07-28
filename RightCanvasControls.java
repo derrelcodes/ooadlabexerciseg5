@@ -23,8 +23,8 @@ public class RightCanvasControls {
         // MODIFICATION: Using direct icon paths
         penButton = createIconButton("icons/Pen.png", "Pen");
         eraserButton = createIconButton("icons/Eraser.png", "Erase");
-        colorButton = createIconButton("icons/Pen Colour.png", "Color");
-        penSizeButton = createIconButton("icons/Pen Size.png", "Size");
+        colorButton = createIconButton("icons/Pen colour.png", "Color");
+        penSizeButton = createIconButton("icons/Pen size.png", "Size");
         saveButton = createIconButton("icons/Save.png", "Save");
 
         penButton.setToolTipText("Pen");
